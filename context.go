@@ -117,8 +117,25 @@ func (c *Context) Cookie(name string) (*http.Cookie, error) {
 	return c.Request.Cookie(name)
 }
 
+func (c *Context) FormValue(key string) string {
+	err := c.Request.ParseForm()
+	if err != nil {
+		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
+	}
+	
+	return c.Request.FormValue(key)
+}
+
 //==================================================== Helper pour les middlewares ======================================================================================
 
 func (c *Context) Set(key string, value any) {
 	c.Data[key] = value
+}
+
+func (c *Context) Get(key string) any {
+	return c.Data[key]
+}
+
+func (c *Context) ClientIP() string {
+	return c.Request.RemoteAddr
 }
