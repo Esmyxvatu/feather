@@ -96,7 +96,10 @@ func (c *Context) Query(key string) string {
     return c.Request.URL.Query().Get(key)
 }
 
-// Helper pour récupérer le contenu de la requête sous format JSON
+/*
+Parse the body data into JSON format. This method reads the request body and decodes it into a structure using encoding/json.
+Return an error if something wrong happened and fill the given structure with the data of the body request.
+*/
 func (c *Context) JSONBody(v any) error {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil { return err }
@@ -117,12 +120,16 @@ func (c *Context) Cookie(name string) (*http.Cookie, error) {
 	return c.Request.Cookie(name)
 }
 
+/* 
+Parse the request's form data. This method reads the request body and decodes it into key-value pairs, according to the Content-Type header (usually application/x-www-form-urlencoded).
+Return the value associated with the given key from the form data. If the key is not present, return an empty string.
+*/
 func (c *Context) FormValue(key string) string {
 	err := c.Request.ParseForm()
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 	}
-	
+
 	return c.Request.FormValue(key)
 }
 
