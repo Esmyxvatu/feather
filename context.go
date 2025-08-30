@@ -10,21 +10,22 @@ import (
 )
 
 type Context struct {
-    Writer  http.ResponseWriter
-    Request *http.Request
-    Params  map[string]string // pour les routes dynamiques
-    Data    map[string]any    // stockage interne pour middleware
+    Writer  http.ResponseWriter	// Default net/http writer object
+    Request *http.Request		// Default net/http request object
+    Params  map[string]string 	// Map storing the data of dynamic routing
+    Data    map[string]any    	// Internal stockage for middleware
 }
 
-//==================================================== Helper pour la réponse ===========================================================================================
+//==================================================== Helper for the response ==========================================================================================
 
-// Helper pour envoyer du contenu sous format JSON.
+// 
 func (c *Context) JSON(status int, obj any) {
     c.Writer.Header().Set("Content-Type", "application/json")
     c.Writer.WriteHeader(status)
 
     json.NewEncoder(c.Writer).Encode(obj)
 }
+
 // Helper pour envoyer du texte pur
 func (c *Context) String(status int, s string) {
     c.Writer.Header().Set("Content-Type", "text/plain")
@@ -89,7 +90,7 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.Writer, cookie)
 }
 
-//==================================================== Helper pour la requête ===========================================================================================
+//==================================================== Helper for the request ===========================================================================================
 
 // Helper pour récupérer un Query param. Correspond au paramètres fourni dans la requête ( /foo?bar=pee )
 func (c *Context) Query(key string) string {
@@ -110,7 +111,7 @@ func (c *Context) JSONBody(v any) error {
 	return nil
 }
 
-// Helper pour récupérer la valeur d'un Header de la requête
+// ...
 func (c *Context) Header(key string) string {
 	return c.Request.Header.Get(key)
 }
@@ -133,7 +134,7 @@ func (c *Context) FormValue(key string) string {
 	return c.Request.FormValue(key)
 }
 
-//==================================================== Helper pour les middlewares ======================================================================================
+//==================================================== Helper for middlewares ===========================================================================================
 
 func (c *Context) Set(key string, value any) {
 	c.Data[key] = value
