@@ -46,16 +46,16 @@ func (c *Context) HTML(status int, content string) {
 func (c *Context) File(status int, path string) {
 	file, err := os.Open(path)
 	if err != nil { http.Error(c.Writer, "File not found", http.StatusNotFound) }
-	
+
 	defer file.Close()
-	
+
 	extension := filepath.Ext(path)
 	ctype := mime.TypeByExtension(extension)
 	if ctype == "" { ctype = "application/octet-stream" } // Fallback
-	
+
 	c.Writer.Header().Set("Content-Type", ctype)
 	c.Writer.WriteHeader(status)
-	
+
 	io.Copy(c.Writer, file)
 }
 
@@ -97,10 +97,8 @@ func (c *Context) Query(key string) string {
     return c.Request.URL.Query().Get(key)
 }
 
-/*
-Parse the body data into JSON format. This method reads the request body and decodes it into a structure using encoding/json.
-Return an error if something wrong happened and fill the given structure with the data of the body request.
-*/
+// BindJSON decodes the request body into the given structure using encoding/json.
+// It returns an error if decoding fails, otherwise the struct is populated with the request data.
 func (c *Context) JSONBody(v any) error {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil { return err }
@@ -111,7 +109,10 @@ func (c *Context) JSONBody(v any) error {
 	return nil
 }
 
-// ...
+// Header retrieves the value of a specific request header.
+// If the header is not present, it returns an empty string.
+//
+// key is the name of the header to retrieve.
 func (c *Context) Header(key string) string {
 	return c.Request.Header.Get(key)
 }
@@ -121,10 +122,9 @@ func (c *Context) Cookie(name string) (*http.Cookie, error) {
 	return c.Request.Cookie(name)
 }
 
-/* 
-Parse the request's form data. This method reads the request body and decodes it into key-value pairs, according to the Content-Type header (usually application/x-www-form-urlencoded).
-Return the value associated with the given key from the form data. If the key is not present, return an empty string.
-*/
+// FormValue parses the request's form data and returns the value for the given key.
+// If the key is not present, it returns an empty string.
+// The request body is parsed according to the Content-Type header (usually application/x-www-form-urlencoded).
 func (c *Context) FormValue(key string) string {
 	err := c.Request.ParseForm()
 	if err != nil {
@@ -146,4 +146,8 @@ func (c *Context) Get(key string) any {
 
 func (c *Context) ClientIP() string {
 	return c.Request.RemoteAddr
+}
+
+func (c *Context) Abort() {
+	c.Data["Abort"] = true
 }

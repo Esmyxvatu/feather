@@ -1,0 +1,4 @@
+server.GET("/:id", handler)
+
+server.AddMiddleware(middleware)
+
