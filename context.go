@@ -151,3 +151,13 @@ func (c *Context) ClientIP() string {
 func (c *Context) Abort() {
 	c.Data["Abort"] = true
 }
+
+func (c *Context) Post(function HandlerFunc) {
+	postMw := c.Data["PostFunc"].( []HandlerFunc )
+	
+	if len(postMw) == 0 {
+		c.Data["PostFunc"] = make([]HandlerFunc, 0)
+	}
+	
+	c.Data["PostFunc"] = append( c.Data["PostFunc"].( []HandlerFunc ), function )
+}

@@ -81,6 +81,15 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, reader *http.Request
 	}
 
 	handler(context)
+	
+	postFuncs, ok := context.Data["PostFunc"].( []HandlerFunc )
+	if !ok {
+		return
+	}
+	
+	for _, fn := range postFuncs {
+		fn(context)
+	}
 }
 
 func (server *Server) Listen(addr string) error {
