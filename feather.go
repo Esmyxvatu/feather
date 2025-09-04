@@ -73,6 +73,7 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, reader *http.Request
 		Data:    make(map[string]any),
 	}
 	context.Data["PostFunc"] = make([]HandlerFunc, 0)
+	context.Data["Abort"] = false
 
 	for _, mw := range server.middlewares {
 		mw(context)
