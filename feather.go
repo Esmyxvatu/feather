@@ -14,6 +14,7 @@ type Server struct {
 func NewServer() *Server {
 	return &Server{
 		routes: make(map[string]map[string]HandlerFunc),
+		middlewares: make([]HandlerFunc, 0),
 	}
 }
 
