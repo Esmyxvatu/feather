@@ -153,11 +153,11 @@ func (c *Context) Abort() {
 }
 
 func (c *Context) Post(function HandlerFunc) {
-	postMw := c.Data["PostFunc"].( []HandlerFunc )
+	postMw, ok := c.Data["PostFunc"]
 	
-	if len(postMw) == 0 {
+	if !ok {
 		c.Data["PostFunc"] = make([]HandlerFunc, 0)
 	}
 	
-	c.Data["PostFunc"] = append( c.Data["PostFunc"].( []HandlerFunc ), function )
+	c.Data["PostFunc"] = append( postMw.( []HandlerFunc ), function )
 }
