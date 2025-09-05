@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+const VERSION string = "0.1.0"
+
 type HandlerFunc func(c *Context)
 
 type Server struct {

@@ -5,6 +5,7 @@ import (
 	"time"
 	"fmt"
 	"strings"
+	"runtime"
 	
 	"github.com/esmyxvatu/feather"
 )
@@ -20,6 +21,18 @@ func (recorder *responseRecorder) WriteHeader(code int) {
 }
 
 func Logging() feather.HandlerFunc {
+	_, filepath, line, _ := runtime.Caller(1)
+	file := strings.Split(filepath, "/")[len(strings.Split(filepath, "/"))-1]
+	fileName := strings.Split(file, ".")[0]
+	
+	date := time.Now()
+	fmt.Printf("\033[1m%s\033[0m |\033[44m %s \033[0m| %-20s | %s\n",
+		date.Format("2006/01/02 15:04:05.000"),
+		"DEBUG",
+		fileName + ":" + fmt.Sprint(line),
+		"Logger initialized, using Feather v" + feather.VERSION,
+	)
+	
 	return func(c *feather.Context) {
 		start := time.Now()
 		status := http.StatusOK

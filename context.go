@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
+	"html/template"
+	"math/rand"
 )
 
 type Context struct {
@@ -88,6 +91,27 @@ func (c *Context) ContentType(value string) {
 // Helper pour ajouter un cookie à la réponse
 func (c *Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.Writer, cookie)
+}
+
+// Helper pour envoyer des template de html/template
+func (c *Context) Template(files []string, data any, funcs template.FuncMap) {
+	r := rand.New( rand.NewSource( time.Now().UnixNano() ) )
+
+	chars := "abcdefghijklmnopqrstuvwxyz"
+	word := make([]byte, 32)
+	
+	for i := range 32 {
+		word[i] = chars[ r.Intn( len(chars) ) ]
+	}
+	
+	tmpl := template.Must(
+		template.New( string(word) ).Funcs(funcs).ParseFiles(files...),
+	)
+	
+	err := tmpl.Execute(c.Writer, data)
+	if err != nil {
+		c.Error(http.StatusInternalServerError, err.Error())
+	}
 }
 
 //==================================================== Helper for the request ===========================================================================================
