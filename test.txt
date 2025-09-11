@@ -1,4 +1,3 @@
 server.GET("/:id", handler)
 
-server.AddMiddleware(middleware)
-
+-> ["/:id"]["GET"]handler

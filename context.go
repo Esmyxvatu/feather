@@ -21,7 +21,7 @@ type Context struct {
 
 //==================================================== Helper for the response ==========================================================================================
 
-// 
+//
 func (c *Context) JSON(status int, obj any) {
     c.Writer.Header().Set("Content-Type", "application/json")
     c.Writer.WriteHeader(status)
@@ -99,15 +99,15 @@ func (c *Context) Template(files []string, data any, funcs template.FuncMap) {
 
 	chars := "abcdefghijklmnopqrstuvwxyz"
 	word := make([]byte, 32)
-	
+
 	for i := range 32 {
 		word[i] = chars[ r.Intn( len(chars) ) ]
 	}
-	
+
 	tmpl := template.Must(
 		template.New( string(word) ).Funcs(funcs).ParseFiles(files...),
 	)
-	
+
 	err := tmpl.Execute(c.Writer, data)
 	if err != nil {
 		c.Error(http.StatusInternalServerError, err.Error())
@@ -126,7 +126,7 @@ func (c *Context) Query(key string) string {
 func (c *Context) JSONBody(v any) error {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil { return err }
-	
+
 	err = json.Unmarshal(body, v)
 	if err != nil { return err }
 

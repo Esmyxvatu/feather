@@ -26,7 +26,7 @@ func Logging() feather.HandlerFunc {
 	fileName := strings.Split(file, ".")[0]
 	
 	date := time.Now()
-	fmt.Printf("\033[1m%s\033[0m |\033[44m %s \033[0m| %-20s | %s\n",
+	fmt.Printf("\033[1m%s\033[0m │\033[44m %s \033[0m│ %-20s │ %s\n",
 		date.Format("2006/01/02 15:04:05.000"),
 		"DEBUG",
 		fileName + ":" + fmt.Sprint(line),
