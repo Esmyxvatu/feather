@@ -66,7 +66,7 @@ func (server *Server) Handle(pattern string, handler HandlerFunc, methods []stri
 		} 
 	}
 	
-	regexPattern := "^" + strings.Join(fragmentRegex, "/") + "$"
+	regexPattern := "^/" + strings.Join(fragmentRegex, "/") + "$"
 	re, err := regexp.Compile(regexPattern)
 	
 	if err != nil {
