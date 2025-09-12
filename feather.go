@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -101,11 +102,15 @@ func (server *Server) Handle(pattern string, handler HandlerFunc, methods []stri
 			// Default dynamic path /:user
 			fragmentRegex = append(fragmentRegex, "([^/]+)")
 			paramsList = append(paramsList, parts[0][1:])
-		} else if len(parts) == 2 { 
+		} else if len(parts) == 1 && fragment[0] == '*' {
+			// Wildcards /*foo
+			fragmentRegex = append(fragmentRegex, "(.*)")
+			paramsList = append(paramsList, parts[0][1:])
+		} else if len(parts) == 2 && fragment[0] == ':' { 
 			// Dynamic path with custom regex /:id|[0-9]+
 			fragmentRegex = append(fragmentRegex, "(" + parts[1] + ")")
 			paramsList = append(paramsList, parts[0][1:])
-		} else { 
+		} else {
 			// Static path
 			fragmentRegex = append(fragmentRegex, regexp.QuoteMeta(fragment)) 
 		} 
@@ -227,6 +232,34 @@ func (server *Server) PATCH(pattern string, handler HandlerFunc) {
 */
 func (server *Server) DELETE(pattern string, handler HandlerFunc) {
 	server.Handle(pattern, handler, []string{"DELETE"})
+}
+
+/*
+	Static serves files from a specified folder when the requested URL matches a given prefix.
+
+	This function registers a route that maps a URL prefix to a folder on the server's filesystem.
+	When a request is made to a URL that matches the prefix, the server attempts to locate the corresponding
+	file in the specified folder and serves it to the client. The route uses the "GET" HTTP method and supports
+	wildcard paths to serve files dynamically.
+
+	Parameters:
+		- prefix (string): The URL prefix that maps to the folder. For example, if the prefix is "/static",
+			a request to "/static/file.txt" will attempt to serve "file.txt" from the specified folder.
+		- folderPath (string): The path to the folder on the server's filesystem that contains the files to be served.
+
+	Returns:
+		- This function does not return any value. It registers a route with the server to handle file-serving requests.
+*/
+func (server *Server) Static(prefix string, folderPath string) {
+	prefix = strings.TrimSuffix(prefix, "/")
+
+	server.GET(prefix + "/*filepath", func (c *Context) {
+		file := c.Params["filepath"]
+		file = filepath.Clean(file)
+
+		fullPath := filepath.Join(folderPath, file)
+		c.File(http.StatusOK, fullPath)
+	})
 }
 
 /*
