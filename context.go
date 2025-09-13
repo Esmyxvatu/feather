@@ -7,9 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 	"html/template"
-	"math/rand"
 )
 
 // Context represents the state and data associated with an HTTP request and response.
