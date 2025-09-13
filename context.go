@@ -175,31 +175,27 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.Writer, cookie)
 }
 
-// Template renders HTML templates with optional data and custom functions.
+// Template executes an HTML template with the provided files, data, and custom functions.
 //
 // Parameters:
-//   - files: A slice of strings representing the file paths of the templates to be parsed.
-//   - data: The data to be passed to the template for rendering. This can be any type.
-//   - funcs: A template.FuncMap containing custom functions to be used within the templates.
+//   - files: A slice of strings containing the paths to the template files.
+//           The first file in the slice is used as the primary template.
+//   - data: The data to be passed to the template for rendering.
+//          Can be of any type that the template can process.
+//   - funcs: A template.FuncMap containing custom functions that can be used
+//           within the template. Can be nil if no custom functions are needed.
 //
-// This function generates a random name for the template, parses the provided files,
-// and executes the template with the given data. If an error occurs during execution,
-// it sends an HTTP 500 Internal Server Error response with the error message.
+// This function creates a new template, parses the specified files, and executes
+// the template using the provided data. The rendered output is written to the
+// HTTP response. If any error occurs during template parsing or execution,
+// it sends a 500 Internal Server Error response with the error message.
 func (c *Context) Template(files []string, data any, funcs template.FuncMap) {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	chars := "abcdefghijklmnopqrstuvwxyz"
-	word := make([]byte, 32)
-
-	for i := range 32 {
-		word[i] = chars[r.Intn(len(chars))]
-	}
-
-	tmpl := template.Must(
-		template.New(string(word)).Funcs(funcs).ParseFiles(files...),
+	tmpl := template.New("root").Funcs(funcs)
+	tmpl = template.Must(
+		tmpl.ParseFiles(files...),
 	)
 
-	err := tmpl.Execute(c.Writer, data)
+	err := tmpl.ExecuteTemplate(c.Writer, filepath.Base(files[0]), data)
 	if err != nil {
 		c.Error(http.StatusInternalServerError, err.Error())
 	}

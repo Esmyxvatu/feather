@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const VERSION string = "0.1.0"
+const VERSION string = "0.2.1"
 
 // HandlerFunc represents a function that handles an HTTP request.
 // It takes a single parameter:
